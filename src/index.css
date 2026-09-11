@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #b45309;
+  --color-primary-container: #92400e;
+  --color-primary-fixed: #fef3c7;
+  --color-primary-fixed-dim: #fde68a;
+  --color-on-primary-fixed: #451a03;
+  --color-on-primary-fixed-variant: #78350f;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fffbeb;
+
+  --color-secondary: #166534;
+  --color-secondary-container: #dcfce7;
+  --color-secondary-fixed: #bbf7d0;
+  --color-secondary-fixed-dim: #86efac;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #14532d;
+  --color-on-secondary-fixed: #052e16;
+  --color-on-secondary-fixed-variant: #166534;
+
+  --color-tertiary: #0284c7;
+  --color-tertiary-container: #0369a1;
+  --color-tertiary-fixed: #e0f2fe;
+  --color-tertiary-fixed-dim: #bae6fd;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #f0f9ff;
+  --color-on-tertiary-fixed: #082f49;
+  --color-on-tertiary-fixed-variant: #075985;
+
+  --color-error: #dc2626;
+  --color-error-container: #fee2e2;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #991b1b;
+
+  --color-background: #faf9f6;
+  --color-surface: #faf9f6;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #edebe4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f4ef;
+  --color-surface-container: #edebe5;
+  --color-surface-container-high: #e4e1d8;
+  --color-surface-container-highest: #d9d5cb;
+  --color-surface-variant: #edebe5;
+
+  --color-on-surface: #1c1917;
+  --color-on-surface-variant: #57534e;
+  --color-on-background: #1c1917;
+  --color-inverse-surface: #292524;
+  --color-inverse-on-surface: #f5f5f4;
+  --color-inverse-primary: #fde68a;
+  --color-outline: #a8a29e;
+  --color-outline-variant: #e7e5e4;
+
+  --color-cream-surface: #fdfcfa;
+  --color-parchment-bright: #faf8f5;
+  --color-forest-deep: #14532d;
+  --color-forest-vibrant: #166534;
+  --color-verification-mint: #86efac;
+  --color-amber-glow: #f59e0b;
+  --color-amber-deep: #b45309;
+  --color-earth-warm: #78350f;
+  --color-earth-espresso: #451a03;
+
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2.5rem;
+  --spacing-margin-sm: 1rem;
+  --spacing-margin-lg: 3rem;
+  --spacing-gutter: 1.5rem;
+  --spacing-gutter-sm: 1rem;
+  --spacing-gutter-lg: 2rem;
+
+  --font-display-hero: "Plus Jakarta Sans", sans-serif;
+  --font-headline-lg: "Plus Jakarta Sans", sans-serif;
+  --font-headline-md: "Plus Jakarta Sans", sans-serif;
+  --font-headline-sm: "Plus Jakarta Sans", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-body-sm: "Inter", sans-serif;
+  --font-label-caps: "Inter", sans-serif;
+  --font-code-hash: "JetBrains Mono", monospace;
+  --font-code-batch-id: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+    background-color: #fbf2e3;
+  }
+}
+
+/* Static Orangish-Golden Honeycomb Background (No Artificial Shimmer) */
+.honeycomb-amber-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Warm authentic honey base - Starts with warm honey tone on left (NOT white!), warms to rich amber-gold on right */
+.honeycomb-amber-base {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #fbf2e3 0%,
+    #faedd3 22%,
+    #f8e5bf 50%,
+    #f5dcab 78%,
+    #f2d294 100%
+  );
+}
+
+/* Crisp mathematical orangish-golden hexagonal comb grid */
+.honeycomb-amber-grid {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 56 96'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z' fill='%23ea580c' fill-opacity='0.05' stroke='%23c25e10' stroke-width='1' stroke-opacity='0.45' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath d='M28 64 L28 96' stroke='%23c25e10' stroke-width='1' stroke-opacity='0.45' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 56px 96px;
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.40) 0%,
+    rgba(0, 0, 0, 0.50) 30%,
+    rgba(0, 0, 0, 0.65) 65%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.40) 0%,
+    rgba(0, 0, 0, 0.50) 30%,
+    rgba(0, 0, 0, 0.65) 65%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+}
+
+/* Subtle warm natural amber depth wash */
+.honeycomb-amber-wash {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 60% at 100% 40%, rgba(217, 119, 6, 0.12) 0%, transparent 70%),
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(245, 158, 11, 0.03) 40%,
+      rgba(217, 119, 6, 0.08) 100%
+    );
+  mix-blend-mode: multiply;
+}
+
+
+.font-label-caps {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.font-code-batch-id {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.font-code-hash {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+.font-headline-lg {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+.font-headline-md {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+.font-headline-sm {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+.font-display-hero {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 48px;
+  line-height: 56px;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
