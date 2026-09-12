@@ -8,23 +8,16 @@ import { NavTab, ToastMessage } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
+import { HomeDashboardView } from './components/HomeDashboardView';
 import { HarvestBatchesView } from './components/HarvestBatchesView';
 import { MyBeehivesView } from './components/MyBeehivesView';
 import { RegisterBatchView } from './components/RegisterBatchView';
 import { NmrLabReportsView } from './components/NmrLabReportsView';
-import { MspEarningsView } from './components/MspEarningsView';
+import { CooperativePoolsView } from './components/CooperativePoolsView';
 import { MarketplaceView } from './components/MarketplaceView';
-import {
-  Package,
-  Layers,
-  PlusCircle,
-  FlaskConical,
-  Wallet,
-  ShoppingBag
-} from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<NavTab>('harvest-batches');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [lang, setLang] = useState<'en' | 'hi'>('en');
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -58,10 +51,14 @@ export default function App() {
           onSelectTab={setActiveTab}
           lang={lang}
           onToggleLang={() => setLang((prev) => (prev === 'hi' ? 'en' : 'hi'))}
+          onSetLang={(newLang) => setLang(newLang)}
         />
 
         {/* Main View Area - Each tab is strictly isolated */}
-        <main className="flex-1 w-full pb-20 lg:pb-8">
+        <main className="flex-1 w-full pb-8">
+          {activeTab === 'home' && (
+            <HomeDashboardView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
+          )}
           {activeTab === 'harvest-batches' && (
             <HarvestBatchesView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
           )}
@@ -74,74 +71,16 @@ export default function App() {
           {activeTab === 'nmr-lab-reports' && (
             <NmrLabReportsView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
           )}
-          {activeTab === 'msp-payouts-and-schemes' && (
-            <MspEarningsView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
+          {(activeTab === 'cooperative-pools' || activeTab === 'msp-payouts-and-schemes') && (
+            <CooperativePoolsView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
           )}
           {activeTab === 'marketplace-and-challenge' && (
             <MarketplaceView lang={lang} onNavigateTab={setActiveTab} onShowToast={showToast} />
           )}
         </main>
 
-        {/* Bottom Sticky Mobile Nav for Quick Access */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200 px-1 py-1 flex items-center justify-around shadow-lg">
-          <button
-            onClick={() => setActiveTab('harvest-batches')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'harvest-batches' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <Package className="w-5 h-5" />
-            <span className="text-[10px]">Batches</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('my-beehives')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'my-beehives' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <Layers className="w-5 h-5" />
-            <span className="text-[10px]">Beehives</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('register-batch')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'register-batch' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <PlusCircle className="w-5 h-5" />
-            <span className="text-[10px]">Register</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('nmr-lab-reports')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'nmr-lab-reports' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <FlaskConical className="w-5 h-5" />
-            <span className="text-[10px]">Lab Tests</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('msp-payouts-and-schemes')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'msp-payouts-and-schemes' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <Wallet className="w-5 h-5" />
-            <span className="text-[10px]">MSP</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('marketplace-and-challenge')}
-            className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg transition-colors ${
-              activeTab === 'marketplace-and-challenge' ? 'text-amber-800 font-bold' : 'text-stone-500'
-            }`}
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span className="text-[10px]">Market</span>
-          </button>
-        </div>
-
         {/* Global Clean Footer */}
-        <Footer />
+        <Footer lang={lang} />
       </div>
 
       {/* Toast Notification */}

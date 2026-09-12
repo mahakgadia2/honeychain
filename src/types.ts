@@ -1,8 +1,10 @@
 export type NavTab = 
+  | 'home'
   | 'register-batch'
   | 'my-beehives'
   | 'harvest-batches'
   | 'nmr-lab-reports'
+  | 'cooperative-pools'
   | 'msp-payouts-and-schemes'
   | 'marketplace-and-challenge';
 

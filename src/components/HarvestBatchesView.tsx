@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Eye,
   Check,
-  Droplet
+  Droplet,
+  Users
 } from 'lucide-react';
 
 interface HarvestBatchesViewProps {
@@ -145,9 +146,9 @@ export function HarvestBatchesView({ onNavigateTab, onShowToast, lang = 'en' }: 
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => onNavigateTab('register-batch')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold shadow-xs transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-800 hover:bg-amber-900 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
-            <PlusCircle className="w-4 h-4" />
+            <PlusCircle className="w-4 h-4 text-red-400 stroke-[2.5]" />
             <span>+ नई फसल दर्ज करें (+ Register New Batch)</span>
           </button>
           <button
@@ -541,6 +542,13 @@ export function HarvestBatchesView({ onNavigateTab, onShowToast, lang = 'en' }: 
                 title="View Lab Report"
               >
                 <Eye className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onNavigateTab('cooperative-pools')}
+                className="p-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 transition-colors"
+                title="Pledge to Cooperative Pool (शहद संघ)"
+              >
+                <Users className="w-4 h-4" />
               </button>
             </div>
           </div>
