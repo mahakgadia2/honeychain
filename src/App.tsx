@@ -15,6 +15,7 @@ import { RegisterBatchView } from './components/RegisterBatchView';
 import { NmrLabReportsView } from './components/NmrLabReportsView';
 import { CooperativePoolsView } from './components/CooperativePoolsView';
 import { MarketplaceView } from './components/MarketplaceView';
+import { FooterNavBar } from './components/FooterNavBar';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
@@ -79,8 +80,17 @@ export default function App() {
           )}
         </main>
 
-        {/* Global Clean Footer */}
-        <Footer lang={lang} />
+        {/* Global Clean Regulatory Footer with spacing for bottom bar */}
+        <div className="pb-20 sm:pb-24">
+          <Footer lang={lang} />
+        </div>
+
+        {/* Exclusive Footer Navigation Bar */}
+        <FooterNavBar
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+          lang={lang}
+        />
       </div>
 
       {/* Toast Notification */}
