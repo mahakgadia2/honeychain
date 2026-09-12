@@ -331,8 +331,8 @@ export function HomeDashboardView({
                 </h3>
                 <p className="text-xs font-semibold tracking-wider text-stone-500 mt-1 leading-relaxed">
                   {lang === 'hi'
-                    ? 'सामूहिक निर्यात पूल, एमएसपी न्यूनतम समर्थन मूल्य व थोक खरीदार'
-                    : 'Collective export pooling, KVIC MSP guarantee & bulk corporate orders'}
+                    ? 'सामूहिक निर्यात पूल, PGS जैविक गारंटी, एमएसपी समर्थन मूल्य व थोक खरीदार'
+                    : 'Collective export pooling, PGS organic peer guarantee & bulk corporate orders'}
                 </p>
               </div>
             </div>

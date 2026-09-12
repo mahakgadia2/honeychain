@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavTab, ToastMessage } from '../types';
+import { PgsGuaranteeView } from './PgsGuaranteeView';
 import {
   Users,
   Package,
@@ -25,7 +26,9 @@ import {
   Sparkles,
   ChevronRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Ban,
+  CalendarCheck
 } from 'lucide-react';
 
 interface CooperativePoolsViewProps {
@@ -128,6 +131,8 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
   const [selectedTargetPoolId, setSelectedTargetPoolId] = useState<string>('pool-robinia-eu');
   const [isSubmittingPledge, setIsSubmittingPledge] = useState(false);
   const [mobileSubTab, setMobileSubTab] = useState<'orders' | 'pledge'>('orders');
+  const [coopSubSection, setCoopSubSection] = useState<'pools' | 'pgs' | 'pledge'>('pools');
+  const [userIsUnderViolation, setUserIsUnderViolation] = useState(false);
 
   // Pools Data
   const [pools, setPools] = useState<PoolContract[]>([
@@ -263,6 +268,17 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
     }, 0);
 
   const handlePledgeCommit = () => {
+    if (userIsUnderViolation) {
+      onShowToast({
+        title: lang === 'hi' ? 'PGS नियम: समूह बिक्री स्थगित' : 'PGS Rule: Produce Sale Withheld',
+        message: lang === 'hi'
+          ? 'भागीदारी गारंटी प्रणाली (PGS) के अनुसार, यदि कोई किसान उल्लंघन करता है, तो सुधार होने तक उसका उत्पाद समूह के माध्यम से नहीं बेचा जा सकता।'
+          : 'Under PGS scheme rules, produce cannot be sold through the group till you rectify the violation and receive peer re-inspection.',
+        type: 'error'
+      });
+      return;
+    }
+
     if (activeSelectedLot.status === 'pledged') {
       onShowToast({
         title: 'Lot Already Reserved',
@@ -364,22 +380,36 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
           </div>
 
           {/* Right Header CTAs */}
-          <div className="flex flex-col xs:flex-row lg:flex-col items-stretch gap-2 shrink-0 lg:w-56">
+          <div className="flex flex-col xs:flex-row lg:flex-col items-stretch gap-2 shrink-0 lg:w-60">
+            <button
+              onClick={() => setCoopSubSection('pgs')}
+              className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-colors min-h-[42px] cursor-pointer ${
+                coopSubSection === 'pgs'
+                  ? 'bg-emerald-800 text-white ring-2 ring-emerald-400'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>PGS Organic Scheme</span>
+              <span className="text-[10px] bg-emerald-200/80 text-emerald-950 font-bold px-1.5 py-0.5 rounded">
+                Verified
+              </span>
+            </button>
             <button
               onClick={() => setIsJoinFpoModalOpen(true)}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-lg bg-amber-900 hover:bg-amber-950 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors min-h-[44px]"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-lg bg-amber-900 hover:bg-amber-950 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors min-h-[42px]"
             >
               <Users className="w-4 h-4 text-amber-200" />
               <span>Join a Cooperative</span>
-              <span className="text-[11px] opacity-80 font-normal hidden sm:inline">(नया संघ खोजें)</span>
+              <span className="text-[11px] opacity-80 font-normal hidden sm:inline">(नया संघ)</span>
             </button>
             <button
               onClick={() => setIsVideoModalOpen(true)}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-lg bg-stone-100 hover:bg-stone-200/90 text-stone-800 text-xs sm:text-sm font-semibold border border-stone-200 transition-colors min-h-[44px]"
+              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 sm:py-2 rounded-lg bg-stone-100 hover:bg-stone-200/90 text-stone-800 text-xs sm:text-sm font-semibold border border-stone-200 transition-colors min-h-[38px]"
             >
-              <Play className="w-4 h-4 text-amber-800 fill-amber-800" />
+              <Play className="w-3.5 h-3.5 text-amber-800 fill-amber-800" />
               <span>Video Guide</span>
-              <span className="text-[11px] text-stone-500 font-normal hidden sm:inline">(वीडियो गाइड)</span>
+              <span className="text-[11px] text-stone-500 font-normal hidden sm:inline">(गाइड)</span>
             </button>
           </div>
         </div>
@@ -491,41 +521,125 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
         </div>
       </section>
 
-      {/* Mobile Screen Segmented Switcher for Phone Displays */}
-      <div className="lg:hidden flex p-1 rounded-xl bg-stone-100 border border-stone-300/80 shadow-2xs">
+      {/* 2b. PGS Participatory Guarantee Scheme Status Banner */}
+      <section className="bg-linear-to-r from-emerald-950 via-stone-900 to-amber-950 text-white rounded-xl p-4 sm:p-5 border border-emerald-700/60 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0 text-emerald-300">
+            <ShieldCheck className="w-6 h-6 text-emerald-400" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs sm:text-sm font-black text-emerald-300 uppercase tracking-wide">
+                {lang === 'hi'
+                  ? 'भागीदारी गारंटी प्रणाली (PGS-India) जैविक योजना'
+                  : 'Participatory Guarantee Systems (PGS) Organic Scheme'}
+              </span>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded font-mono font-bold">
+                Pahalgam Circle #04
+              </span>
+              {userIsUnderViolation ? (
+                <span className="text-[10px] bg-rose-500/30 text-rose-200 border border-rose-400/40 px-2 py-0.5 rounded font-bold uppercase">
+                  Sale Withheld (Violation Active)
+                </span>
+              ) : (
+                <span className="text-[10px] bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 px-2 py-0.5 rounded font-bold uppercase">
+                  5/6 Peers Vouched • 1 In Rectification
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-stone-200 mt-1 max-w-3xl leading-relaxed">
+              {lang === 'hi'
+                ? 'समूह के किसान एक-दूसरे की भूमि का निरीक्षण करते हैं व साप्ताहिक परामर्श देते हैं। यदि कोई किसान उल्लंघन करता पाया जाता है, तो जब तक वह सुधार न कर ले, समूह में उसका शहद नहीं बेचा जाता।'
+                : "Farmers in a group inspect each other's land and vouch for its organic credentials. Inspections are conducted at season-start with weekly peer counsel. Violations result in produce sale withheld until rectified."}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 shrink-0 self-start md:self-center">
+          <button
+            type="button"
+            onClick={() => setCoopSubSection('pgs')}
+            className={`px-4 py-2.5 rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer ${
+              coopSubSection === 'pgs'
+                ? 'bg-white text-stone-900 ring-2 ring-emerald-400'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+            }`}
+          >
+            <span>{coopSubSection === 'pgs' ? 'Viewing PGS Scheme' : 'Inspect PGS Scheme'}</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </section>
+
+      {/* 2c. Section Navigation Switcher (Desktop & Mobile) */}
+      <div className="flex p-1 rounded-xl bg-stone-100 border border-stone-300/80 shadow-2xs">
         <button
           type="button"
-          onClick={() => setMobileSubTab('orders')}
-          className={`flex-1 py-2.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[42px] ${
-            mobileSubTab === 'orders'
+          onClick={() => {
+            setCoopSubSection('pools');
+            setMobileSubTab('orders');
+          }}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 min-h-[42px] cursor-pointer ${
+            coopSubSection === 'pools'
               ? 'bg-white text-stone-900 shadow-xs'
               : 'text-stone-600 hover:text-stone-900'
           }`}
         >
           <Package className="w-4 h-4 text-amber-800 shrink-0" />
-          <span className="truncate">{lang === 'hi' ? 'सामूहिक मांग' : 'Bulk Orders'} ({pools.length})</span>
+          <span>{lang === 'hi' ? 'सामूहिक निर्यात मांग' : 'Bulk Export Pools'} ({pools.length})</span>
         </button>
+
         <button
           type="button"
-          onClick={() => setMobileSubTab('pledge')}
-          className={`flex-1 py-2.5 px-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[42px] ${
-            mobileSubTab === 'pledge'
+          onClick={() => setCoopSubSection('pgs')}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 min-h-[42px] cursor-pointer ${
+            coopSubSection === 'pgs'
+              ? 'bg-emerald-800 text-white shadow-xs'
+              : 'text-stone-600 hover:text-stone-900'
+          }`}
+        >
+          <ShieldCheck className={`w-4 h-4 shrink-0 ${coopSubSection === 'pgs' ? 'text-emerald-200' : 'text-emerald-700'}`} />
+          <span className="truncate">{lang === 'hi' ? 'PGS सहकर्मी जैविक गारंटी' : 'PGS Organic Peer Guarantee'}</span>
+          <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${coopSubSection === 'pgs' ? 'bg-emerald-700 text-emerald-100' : 'bg-emerald-100 text-emerald-900'}`}>
+            5/6 Vouched
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setCoopSubSection('pledge');
+            setMobileSubTab('pledge');
+          }}
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 min-h-[42px] cursor-pointer ${
+            coopSubSection === 'pledge'
               ? 'bg-white text-stone-900 shadow-xs'
               : 'text-stone-600 hover:text-stone-900'
           }`}
         >
-          <Lock className="w-4 h-4 text-emerald-700 shrink-0" />
-          <span className="truncate">{lang === 'hi' ? 'आरक्षण फॉर्म' : 'Pledge Form'}</span>
+          <Lock className="w-4 h-4 text-amber-800 shrink-0" />
+          <span>{lang === 'hi' ? 'लॉट आरक्षण (Pledge)' : 'Pledge Batch'}</span>
           {farmerLots.some(l => l.status === 'pledged') && (
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
           )}
         </button>
       </div>
 
+      {/* 2d. PGS Guarantee View Conditional Display */}
+      {coopSubSection === 'pgs' && (
+        <PgsGuaranteeView
+          lang={lang}
+          onShowToast={onShowToast}
+          onSelectPoolTab={() => setCoopSubSection('pools')}
+          userIsUnderViolation={userIsUnderViolation}
+          onToggleUserViolation={(v) => setUserIsUnderViolation(v)}
+        />
+      )}
+
       {/* 3. Main 2-Column Section: Bulk Orders vs Pledge Form */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+      <section className={`grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start ${coopSubSection === 'pgs' ? 'hidden' : ''}`}>
         {/* Left Column (Col 8): Featured Bulk Demand Orders */}
-        <div className={`lg:col-span-7 xl:col-span-8 space-y-4 sm:space-y-6 ${mobileSubTab === 'orders' ? 'block' : 'hidden lg:block'}`}>
+        <div className={`space-y-4 sm:space-y-6 ${coopSubSection === 'pledge' ? 'hidden' : 'lg:col-span-7 xl:col-span-8'} ${mobileSubTab === 'orders' ? 'block' : 'hidden lg:block'}`}>
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-stone-900 tracking-tight">
@@ -772,7 +886,7 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
         </div>
 
         {/* Right Column: 1-Click "Commit Batch" Form & Depot Card */}
-        <div className={`lg:col-span-5 xl:col-span-4 space-y-4 sm:space-y-6 ${mobileSubTab === 'pledge' ? 'block' : 'hidden lg:block'}`}>
+        <div className={`space-y-4 sm:space-y-6 ${coopSubSection === 'pledge' ? 'lg:col-span-8 lg:col-start-3 max-w-2xl mx-auto w-full' : 'lg:col-span-5 xl:col-span-4'} ${coopSubSection === 'pledge' || mobileSubTab === 'pledge' ? 'block' : 'hidden lg:block'}`}>
           {/* Card 1: Pledge Batch to Pool Form */}
           <div
             id="pledge-form-card"
@@ -901,10 +1015,63 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
               </div>
             </div>
 
+            {/* PGS Organic Guarantee Clearance Box */}
+            <div
+              className={`p-3.5 rounded-xl border text-xs space-y-2 ${
+                userIsUnderViolation
+                  ? 'bg-rose-50 border-rose-300 text-rose-950 ring-1 ring-rose-200'
+                  : 'bg-emerald-50/70 border-emerald-300 text-emerald-950'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="font-bold flex items-center gap-1.5">
+                  {userIsUnderViolation ? (
+                    <Ban className="w-4 h-4 text-rose-700 shrink-0" />
+                  ) : (
+                    <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                  )}
+                  <span>
+                    {userIsUnderViolation
+                      ? (lang === 'hi' ? 'PGS उल्लंघन सक्रिय • समूह बिक्री स्थगित' : 'PGS Violation Active • Produce Sale Withheld')
+                      : (lang === 'hi' ? 'PGS सहकर्मी जैविक प्रमाणन • मान्य' : 'PGS Peer Organic Voucher • Cleared')}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCoopSubSection('pgs')}
+                  className="text-[11px] font-bold text-amber-900 hover:underline cursor-pointer"
+                >
+                  {lang === 'hi' ? 'योजना देखें' : 'View Scheme'} →
+                </button>
+              </div>
+
+              <p className="text-[11px] text-stone-600 leading-relaxed">
+                {userIsUnderViolation
+                  ? (lang === 'hi'
+                      ? 'PGS नियम: यदि कोई किसान नियमों का उल्लंघन करता पाया जाता है, तो जब तक वह सुधार न कर ले, समूह में उसका उत्पाद नहीं बेचा जा सकता।'
+                      : 'Under PGS scheme rules: If a farmer is found to be in violation, produce is NOT sold through the group till she rectifies her mistake.')
+                  : (lang === 'hi'
+                      ? 'पहलगाम सर्कल #04 द्वारा फार्म का निरीक्षण व साप्ताहिक परामर्श सत्यापित। 100% जैविक निर्यात हेतु मान्य।'
+                      : 'Inspected by local peer farmers at season start and counselled weekly. 100% organic vouched.')}
+              </p>
+
+              {/* Toggle to simulate / test enforcement rule */}
+              <div className="pt-1.5 flex items-center justify-between border-t border-stone-200/60 text-[10px] text-stone-500">
+                <span>{lang === 'hi' ? 'PGS नियम परीक्षण (सिमुलेशन):' : 'PGS Rule Safeguard Simulation:'}</span>
+                <button
+                  type="button"
+                  onClick={() => setUserIsUnderViolation(!userIsUnderViolation)}
+                  className="px-2 py-0.5 rounded bg-white border border-stone-300 font-semibold hover:bg-stone-50 text-stone-700 cursor-pointer"
+                >
+                  {userIsUnderViolation ? 'Reset to Vouched (Clean)' : 'Test Violation Lock'}
+                </button>
+              </div>
+            </div>
+
             {/* Smart Escrow Security Note */}
-            <div className="p-3 rounded-lg bg-emerald-50/60 border border-emerald-200/60 text-emerald-900 text-xs flex items-start gap-2">
+            <div className="p-3 rounded-lg bg-stone-50 border border-stone-200 text-stone-700 text-xs flex items-start gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
-              <p className="leading-snug">
+              <p className="leading-snug text-stone-600">
                 <strong>Smart Escrow Security:</strong> Payout auto-executes straight to Ghulam Mohammad's Aadhaar DBT account upon hub composite barcode scan.
               </p>
             </div>
@@ -913,10 +1080,19 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
             <div className="space-y-1.5 pt-1">
               <button
                 onClick={handlePledgeCommit}
-                disabled={isSubmittingPledge}
-                className="w-full py-3 px-4 rounded-lg bg-amber-900 hover:bg-amber-950 active:scale-[0.99] text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                disabled={isSubmittingPledge || userIsUnderViolation}
+                className={`w-full py-3 px-4 rounded-lg font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  userIsUnderViolation
+                    ? 'bg-rose-900 hover:bg-rose-950 text-white cursor-not-allowed opacity-90'
+                    : 'bg-amber-900 hover:bg-amber-950 active:scale-[0.99] text-white disabled:opacity-75'
+                }`}
               >
-                {isSubmittingPledge ? (
+                {userIsUnderViolation ? (
+                  <>
+                    <Ban className="w-4 h-4 text-rose-300" />
+                    <span>Sale Withheld (PGS Violation Active)</span>
+                  </>
+                ) : isSubmittingPledge ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Minting Blockchain Pledge...</span>
@@ -929,7 +1105,9 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
                 )}
               </button>
               <div className="text-center text-[10px] text-stone-500 font-mono">
-                Cryptographic Hash generated on Polygon Private Network
+                {userIsUnderViolation
+                  ? 'Resolve violation in PGS scheme tab to re-authorize group sale'
+                  : 'Cryptographic Hash generated on Polygon Private Network'}
               </div>
             </div>
           </div>
@@ -970,7 +1148,9 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
       </section>
 
       {/* 4. Bottom Educational & Operational Flow (How Collective Aggregation Works) */}
-      <section className="bg-white rounded-xl border border-stone-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+      {coopSubSection !== 'pgs' && (
+        <>
+          <section className="bg-white rounded-xl border border-stone-200/90 p-6 sm:p-8 shadow-xs space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-1.5">
           <div className="text-[11px] font-bold tracking-widest uppercase text-amber-800">
             PARCHMENT TO SMART ESCROW • पारदर्शी प्रक्रिया
@@ -1100,6 +1280,8 @@ export function CooperativePoolsView({ onNavigateTab, onShowToast, lang = 'en' }
           </p>
         </div>
       </section>
+    </>
+  )}
 
       {/* MODAL 1: Smart Escrow Contract & Master Composite QR Modal */}
       {selectedEscrowPool && (
